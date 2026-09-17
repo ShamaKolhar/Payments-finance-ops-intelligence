@@ -1,0 +1,61 @@
+merchant_id,merchant_name,segment,city,onboarding_date
+M0001,Merchant_0001,D2C E-commerce,Bengaluru,2025-10-16
+M0002,Merchant_0002,Travel,Mumbai,2026-01-29
+M0003,Merchant_0003,SaaS,Chennai,2024-08-16
+M0004,Merchant_0004,Marketplace,Chennai,2024-04-14
+M0005,Merchant_0005,D2C E-commerce,Pune,2025-07-12
+M0006,Merchant_0006,D2C E-commerce,Bengaluru,2025-03-08
+M0007,Merchant_0007,SaaS,Mumbai,2024-04-05
+M0008,Merchant_0008,EdTech,Bengaluru,2025-06-01
+M0009,Merchant_0009,SaaS,Chennai,2025-07-28
+M0010,Merchant_0010,Marketplace,Pune,2025-10-27
+M0011,Merchant_0011,SaaS,Hyderabad,2025-03-05
+M0012,Merchant_0012,Travel,Bengaluru,2025-08-26
+M0013,Merchant_0013,SaaS,Chennai,2026-02-16
+M0014,Merchant_0014,Travel,Delhi NCR,2025-03-08
+M0015,Merchant_0015,SaaS,Delhi NCR,2024-06-08
+M0016,Merchant_0016,D2C E-commerce,Hyderabad,2024-04-14
+M0017,Merchant_0017,Travel,Delhi NCR,2024-04-09
+M0018,Merchant_0018,Travel,Bengaluru,2025-09-10
+M0019,Merchant_0019,Food Delivery,Pune,2026-01-17
+M0020,Merchant_0020,Food Delivery,Bengaluru,2024-05-07
+M0021,Merchant_0021,Travel,Chennai,2025-07-19
+M0022,Merchant_0022,Travel,Pune,2025-09-25
+M0023,Merchant_0023,Marketplace,Bengaluru,2024-07-15
+M0024,Merchant_0024,Marketplace,Mumbai,2024-02-16
+M0025,Merchant_0025,Travel,Bengaluru,2026-03-02
+M0026,Merchant_0026,D2C E-commerce,Hyderabad,2024-08-26
+M0027,Merchant_0027,Food Delivery,Chennai,2024-10-11
+M0028,Merchant_0028,SaaS,Delhi NCR,2025-01-08
+M0029,Merchant_0029,SaaS,Chennai,2024-12-29
+M0030,Merchant_0030,Marketplace,Chennai,2024-09-30
+M0031,Merchant_0031,D2C E-commerce,Pune,2025-10-25
+M0032,Merchant_0032,SaaS,Pune,2025-10-12
+M0033,Merchant_0033,SaaS,Mumbai,2026-01-16
+M0034,Merchant_0034,Food Delivery,Delhi NCR,2025-04-18
+M0035,Merchant_0035,Marketplace,Pune,2025-10-17
+M0036,Merchant_0036,Marketplace,Delhi NCR,2024-08-12
+M0037,Merchant_0037,D2C E-commerce,Mumbai,2026-02-25
+M0038,Merchant_0038,D2C E-commerce,Delhi NCR,2026-04-21
+M0039,Merchant_0039,Travel,Bengaluru,2025-02-14
+M0040,Merchant_0040,EdTech,Chennai,2024-08-04
+M0041,Merchant_0041,SaaS,Chennai,2024-11-18
+M0042,Merchant_0042,Food Delivery,Chennai,2025-05-26
+M0043,Merchant_0043,SaaS,Delhi NCR,2025-04-14
+M0044,Merchant_0044,SaaS,Chennai,2024-05-22
+M0045,Merchant_0045,EdTech,Delhi NCR,2025-07-28
+M0046,Merchant_0046,EdTech,Hyderabad,2026-02-03
+M0047,Merchant_0047,Food Delivery,Delhi NCR,2025-08-20
+M0048,Merchant_0048,SaaS,Pune,2024-08-12
+M0049,Merchant_0049,D2C E-commerce,Bengaluru,2025-05-20
+M0050,Merchant_0050,SaaS,Chennai,2024-04-22
+M0051,Merchant_0051,Marketplace,Hyderabad,2024-06-12
+M0052,Merchant_0052,D2C E-commerce,Hyderabad,2025-09-02
+M0053,Merchant_0053,EdTech,Hyderabad,2025-01-25
+M0054,Merchant_0054,Travel,Pune,2025-06-25
+M0055,Merchant_0055,Marketplace,Chennai,2024-01-12
+M0056,Merchant_0056,Marketplace,Pune,2024-04-27
+M0057,Merchant_0057,Travel,Chennai,2026-02-07
+M0058,Merchant_0058,D2C E-commerce,Delhi NCR,2024-12-14
+M0059,Merchant_0059,SaaS,Hyderabad,2025-03-21
+M0060,Merchant_0060,Marketplace,Chennai,2024-01-04

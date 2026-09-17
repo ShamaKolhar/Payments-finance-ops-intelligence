@@ -1,0 +1,7 @@
+check,severity,records_flagged,pct_of_transactions,detail_file
+Successful transactions missing a settlement,High,220,1.824,reports\data_quality_details\vw_missing_settlements.csv
+Settlement amount does not reconcile with fee/amount,High,180,1.493,reports\data_quality_details\vw_settlement_mismatches.csv
+Duplicate transactions,High,60,0.498,reports\data_quality_details\vw_duplicate_transactions.csv
+Refund references a non-existent transaction,High,4,0.033,reports\data_quality_details\vw_orphan_refunds.csv
+Settlement completed > 3 days after transaction (SLA breach),Medium,1320,10.945,reports\data_quality_details\vw_late_settlements.csv
+Zero or negative transaction amount,Medium,24,0.199,reports\data_quality_details\vw_invalid_amounts.csv
