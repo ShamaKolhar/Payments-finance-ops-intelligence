@@ -1,10 +1,5 @@
--- ============================================================
--- schema.sql
--- Production-style schema (PostgreSQL dialect).
--- The demo pipeline runs on SQLite for portability (no server
--- setup required to review this project), but this is the
--- schema it is modeled on and can be deployed to as-is.
--- ============================================================
+-- Postgres version of the tables.
+-- The pipeline itself uses SQLite (data/finance_ops.db).
 
 CREATE SCHEMA IF NOT EXISTS finance;
 
@@ -36,11 +31,7 @@ CREATE TABLE finance.settlements (
 
 CREATE TABLE finance.refunds (
     refund_id        VARCHAR(10)  PRIMARY KEY,
-    txn_id           VARCHAR(15)  NOT NULL,  -- intentionally NOT a hard FK here:
-                                              -- orphan refunds are a real-world
-                                              -- failure mode this project detects,
-                                              -- so the constraint is enforced in
-                                              -- the validation layer, not the DDL.
+    txn_id           VARCHAR(15)  NOT NULL,  -- no FK, orphan refunds are checked in validation
     refund_date      DATE         NOT NULL,
     refund_amount    NUMERIC(12,2) NOT NULL,
     reason           VARCHAR(50)
