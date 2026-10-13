@@ -75,6 +75,6 @@ reports/   generated CSVs, DQ detail files, Tableau workbook
 ## Things I'd add next
 
 - Count business days (not calendar days) in the late settlement check
-- Move to Postgres and schedule the pipeline (cron or Airflow)
+- Move to Postgres and schedule the pipeline (Airflow)
 - Exclude flagged records from the KPIs instead of only reporting them
-- Send the weekly summary to Slack/email
+- Send the weekly summary to Slack or email
