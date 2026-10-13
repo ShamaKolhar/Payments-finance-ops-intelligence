@@ -1,15 +1,8 @@
 """
-reporting.py
-------------
-Aggregates business finance KPIs from the (validated) transaction
-data and writes them out as clean, BI-tool-ready CSVs:
-
-  - reports/kpi_daily_summary.csv     (revenue, volume, fail rate, refund rate by day)
-  - reports/kpi_merchant_segment.csv  (revenue & take-rate by segment)
-  - reports/kpi_weekly_snapshot.csv   (single latest-week snapshot used by ai_narrative.py)
-
-These are designed to be the source tables for a Power BI / Tableau
-"Business Finance" dashboard page.
+Builds the KPI tables used by the Tableau dashboard:
+  kpi_daily_summary.csv    - volume, revenue, fail rate, refund rate per day
+  kpi_merchant_segment.csv - revenue and take rate per segment
+  kpi_weekly_snapshot.csv  - last 7 days vs the 7 before (also used by ai_narrative.py)
 """
 
 import os

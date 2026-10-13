@@ -1,13 +1,7 @@
 """
-data_validation.py
--------------------
-Runs the reconciliation/data-quality checks defined in
-sql/validation_checks.sql against the finance database and
-produces:
-  - reports/data_quality_report.csv   (one row per check, with counts + severity)
-  - reports/data_quality_details/*.csv (the actual flagged records per check)
-
-This is the "ensuring data accuracy" half of the JD.
+Runs the checks in sql/validation_checks.sql.
+Writes a summary to reports/data_quality_report.csv and the flagged
+rows for each check to reports/data_quality_details/.
 """
 
 import os
@@ -20,7 +14,7 @@ SQL_PATH = os.path.join(BASE_DIR, "sql", "validation_checks.sql")
 REPORTS_DIR = os.path.join(BASE_DIR, "reports")
 DETAILS_DIR = os.path.join(REPORTS_DIR, "data_quality_details")
 
-# (view_name, human-readable check name, severity)
+# view, description, severity
 CHECKS = [
     ("vw_duplicate_transactions", "Duplicate transactions", "High"),
     ("vw_missing_settlements", "Successful transactions missing a settlement", "High"),
@@ -70,8 +64,7 @@ def run_validation():
 
 if __name__ == "__main__":
     summary = run_validation()
-    print("Data Quality Summary")
-    print("=" * 70)
+    print("Data quality summary:")
     print(summary.to_string(index=False))
     print(f"\nDetail files written to: {DETAILS_DIR}")
     print(f"Summary written to: {os.path.join(REPORTS_DIR, 'data_quality_report.csv')}")

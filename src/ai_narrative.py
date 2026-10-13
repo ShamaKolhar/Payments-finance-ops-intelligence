@@ -1,22 +1,8 @@
 """
-ai_narrative.py
-----------------
-Takes the KPI weekly
-snapshot + data quality summary and asks Claude to draft an
-executive-ready written commentary - the kind of first-pass
-narrative a finance analyst would otherwise write by hand every
-week.
+Drafts the weekly finance summary from the KPI snapshot and DQ report.
 
-Two modes:
-  - LIVE mode: if ANTHROPIC_API_KEY is set in the environment,
-    calls the real Claude API (claude-sonnet-4-6).
-  - OFFLINE/DEMO mode: if no key is set, uses a deterministic
-    template so the pipeline still runs end-to-end and produces
-    a representative sample output for review (see
-    reports/ai_narrative_sample_offline.md for what this looks like).
-
-Usage:
-    python src/ai_narrative.py
+If ANTHROPIC_API_KEY is set it calls the Claude API, otherwise it fills
+in a fixed template (output: reports/ai_narrative_offline.md).
 """
 
 import os
@@ -90,11 +76,7 @@ def call_claude_live(prompt, api_key):
 
 
 def offline_fallback_narrative(weekly, dq, segment):
-    """
-    Deterministic, template-based narrative used when no API key is
-    present, so the pipeline is still fully runnable end-to-end and
-    a reviewer can see representative output without needing a key.
-    """
+    # used when there's no API key
     def metric(name):
         row = weekly[weekly["metric"] == name].iloc[0]
         return row["this_week"], row["wow_change_pct"]
@@ -120,9 +102,7 @@ def offline_fallback_narrative(weekly, dq, segment):
         f"high-severity records (missing settlements, settlement mismatches, duplicate "
         f"transactions, and orphan refunds) - recommend the data team triage these before "
         f"this snapshot is treated as final for reporting.\n\n"
-        f"[This is an OFFLINE template-based narrative, generated because no "
-        f"ANTHROPIC_API_KEY was set. Set the key to have Claude generate this "
-        f"commentary live from the same inputs - see README for setup.]"
+        f"(Template output - set ANTHROPIC_API_KEY to generate this with the API.)"
     )
 
 
@@ -132,12 +112,11 @@ def main():
 
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if api_key:
-        print("ANTHROPIC_API_KEY found - calling Claude live...")
+        print("Calling Claude API...")
         narrative = call_claude_live(prompt, api_key)
         mode = "live"
     else:
-        print("No ANTHROPIC_API_KEY set - using offline template fallback.")
-        print("(Set the env var to generate this commentary live via the Claude API.)")
+        print("No ANTHROPIC_API_KEY, using template instead.")
         narrative = offline_fallback_narrative(weekly, dq, segment)
         mode = "offline"
 
@@ -147,13 +126,11 @@ def main():
         f.write(narrative + "\n")
 
     print(f"\nNarrative written to: {out_path}")
-    print("\n--- PREVIEW ---\n")
+    print()
     try:
         print(narrative)
     except UnicodeEncodeError:
-        # Some Windows terminals default to a codepage that can't print
-        # every character; the file on disk (written as utf-8) is always
-        # correct regardless of what the console can display.
+        # windows console
         print(narrative.encode("ascii", errors="replace").decode("ascii"))
 
 
