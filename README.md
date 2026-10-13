@@ -1,94 +1,44 @@
 # Payments Finance Ops Intelligence
-### Automated Business Reporting & Data Quality Monitoring Pipeline (with AI-generated commentary)
 
-A finance-ops pipeline for a payments company: it ingests transaction,
-settlement, and refund data, catches the data-quality issues that
-normally slip past manual review, rolls everything up into
-BI-ready business KPI reports, and uses the Claude API to auto-draft
-the executive commentary that usually eats an analyst's Monday morning.
+Data quality checks and weekly KPI reporting for a (synthetic) payments company, with an optional LLM-written weekly summary.
 
-Built to mirror the day-to-day of a **Data Analyst, Business Finance**
-role at a payments/fintech company: *"supporting the finance team with
-data and analysis requirements, process improvements and automations
-through AI powered workflows... setting up automated business reports
-and ensuring data accuracy."*
+The idea: a finance team at a payment gateway gets transaction, settlement and refund data every day. Before any of it goes into a report, someone has to check that it actually reconciles. This project does those checks in SQL, builds the KPI tables from the clean data, and drafts the weekly commentary so the analyst only has to edit it.
 
----
-
-## What it does
+## Pipeline
 
 ```
-data/generate_data.py  →  finance_ops.db  →  src/data_validation.py  →  reports/data_quality_report.csv
-                                          →  src/reporting.py          →  reports/kpi_*.csv
-                                                                       →  src/ai_narrative.py → reports/ai_narrative_*.md
+generate_data.py -> finance_ops.db -> data_validation.py -> data_quality_report.csv
+                                   -> reporting.py       -> kpi_*.csv -> Tableau
+                                                         -> ai_narrative.py -> ai_narrative_*.md
 ```
 
-1. **Synthetic payments dataset** — 60 merchants, ~12,000 transactions
-   across 3 months, with settlements and refunds, and *deliberately
-   injected* real-world data problems (duplicates, missing settlements,
-   amount mismatches, late settlements, orphan refunds, bad amounts).
-2. **Data accuracy layer** (SQL + Python) — reconciles transactions
-   against settlements and refunds, flags every issue by severity, and
-   writes both a summary and the underlying bad records.
-3. **Automated business reporting** (SQL + Python) — daily KPIs, revenue
-   by merchant segment, and a week-over-week snapshot, all as clean
-   CSVs ready to plug into Power BI or Tableau.
-4. **AI-powered workflow (Claude API)** — turns the KPI snapshot and
-   data-quality summary into a short, plain-English executive
-   commentary automatically, instead of an analyst writing it by hand
-   every week.
+1. **Data** - `data/generate_data.py` creates 60 merchants and ~12k transactions (Jun-Aug 2026) plus settlements and refunds. I added some common reconciliation problems on purpose so the checks have something to find.
+2. **Validation** - `sql/validation_checks.sql` defines 6 checks as views. `src/data_validation.py` runs them and writes a summary plus the flagged rows for each check.
+3. **Reporting** - `src/reporting.py` builds daily KPIs, segment-level revenue/take rate and a week-over-week snapshot.
+4. **Commentary** - `src/ai_narrative.py` sends the weekly snapshot and the high-severity DQ issues to the Claude API and asks for a short summary. Without an API key it falls back to a fixed template.
+5. **Dashboard** - `reports/Payments Finance - Weekly Statement.twb` is a Tableau workbook built on the KPI and data quality CSVs.
 
-## Why it's built this way
+## Data quality checks
 
-Every piece maps directly onto a line in the job description:
+| Check | Rule | Severity |
+|---|---|---|
+| Duplicate transactions | same merchant, date, amount and method more than once | High |
+| Missing settlements | successful txn with no settlement row | High |
+| Settlement mismatch | `settled_amount` differs from `amount - fee` by more than Rs 1 | High |
+| Orphan refunds | refund `txn_id` not found in transactions | High |
+| Late settlements | settled more than 3 days after txn date | Medium |
+| Invalid amounts | amount <= 0 | Medium |
 
-| JD requirement | Where it's covered |
-|---|---|
-| SQL | `sql/schema.sql`, `sql/validation_checks.sql` |
-| Python | `data/generate_data.py`, `src/data_validation.py`, `src/reporting.py` |
-| Claude / AI tools, AI-powered workflows | `src/ai_narrative.py` |
-| Automated business reports | `src/reporting.py` → `reports/kpi_*.csv`, run via `run_pipeline.py` |
-| Ensuring data accuracy | `src/data_validation.py` → `reports/data_quality_report.csv` |
-| Power BI / Tableau | `docs/dashboard_guide.md` — CSVs designed as direct BI sources |
+On the last run these flagged 464 high-severity records (mostly missing settlements and settlement mismatches), about 3.8% of transactions.
 
-## Folder structure
-
-```
-payments-finance-ops-intelligence/
-├── README.md
-├── requirements.txt
-├── run_pipeline.py              ← run this to execute everything
-├── data/
-│   ├── generate_data.py
-│   ├── raw/                     ← generated CSVs (merchants, transactions, settlements, refunds)
-│   └── finance_ops.db           ← generated SQLite DB
-├── sql/
-│   ├── schema.sql                ← production-style Postgres DDL
-│   └── validation_checks.sql     ← the 6 reconciliation/DQ checks, as views
-├── src/
-│   ├── data_validation.py        ← runs the DQ checks, writes reports/data_quality_report.csv
-│   ├── reporting.py               ← builds the KPI CSVs
-│   └── ai_narrative.py            ← Claude API commentary generator (+ offline demo mode)
-├── reports/                      ← all generated output lands here
-│   ├── data_quality_report.csv
-│   ├── data_quality_details/
-│   ├── kpi_daily_summary.csv
-│   ├── kpi_merchant_segment.csv
-│   ├── kpi_weekly_snapshot.csv
-│   └── ai_narrative_offline.md   ← sample output, included so it's reviewable with no setup
-└── docs/
-    └── dashboard_guide.md         ← how to wire the CSVs into Power BI / Tableau
-```
-
-## Running it
+## How to run
 
 ```bash
 pip install -r requirements.txt
 python run_pipeline.py
 ```
 
-This regenerates the dataset and every report from scratch, in order.
-Individual stages can also be run on their own:
+Or run each step on its own:
 
 ```bash
 python data/generate_data.py
@@ -97,44 +47,34 @@ python src/reporting.py
 python src/ai_narrative.py
 ```
 
-### Enabling live AI commentary
-
-By default `ai_narrative.py` runs in **offline mode** — a deterministic
-template stands in for Claude so the pipeline works with zero setup
-(see `reports/ai_narrative_offline.md` for a sample). To generate the
-commentary live via the Claude API instead:
+For the live LLM summary, set your key first:
 
 ```bash
-export ANTHROPIC_API_KEY="your-key-here"
+export ANTHROPIC_API_KEY="..."
 python src/ai_narrative.py
 ```
 
-## The data quality checks, specifically
+`reports/ai_narrative_offline.md` shows the output of the offline fallback.
 
-| Check | What it catches |
-|---|---|
-| Duplicate transactions | Same merchant/date/amount/method inserted more than once |
-| Missing settlements | Successful transactions with no matching settlement record |
-| Settlement mismatches | `settled_amount ≠ transaction amount − fee`, beyond rounding tolerance |
-| Late settlements | Settled >3 days after the transaction (SLA breach) |
-| Orphan refunds | Refund references a `txn_id` that doesn't exist |
-| Invalid amounts | Zero or negative transaction amounts |
+## Project structure
 
-Each is a real failure mode in payment reconciliation, not a toy example —
-this is the same category of issue a business finance analyst at a
-payments company would be expected to catch before numbers go into a
-report.
+```
+data/      generate_data.py, raw CSVs, SQLite db
+sql/       schema.sql (Postgres version of the tables), validation_checks.sql
+src/       data_validation.py, reporting.py, ai_narrative.py
+reports/   generated CSVs, DQ detail files, Tableau workbook
+```
 
-## Notes on the data
+## Notes
 
-The dataset is synthetic (seeded, reproducible via `generate_data.py`)
-and modeled loosely on typical Indian payments-gateway economics
-(UPI/Card/Netbanking/Wallet/EMI mix, ~2.1% take rate). No real
-transaction or merchant data is used anywhere in this project.
+- All data is synthetic and seeded (seed 42), so reruns give the same numbers. Amounts are in INR and the fee is a flat 2.1%, roughly in line with Indian gateway pricing.
+- The pipeline runs on SQLite so it needs no setup. `schema.sql` is the Postgres version of the same tables.
+- `refunds.txn_id` has no foreign key on purpose, otherwise orphan refunds couldn't be loaded and checked.
+- The late settlement check counts calendar days, so anything settled over a weekend also gets flagged. That's why it catches ~11% of settlements when only ~3% were made late in the data. Changing it to business days is on the list below.
 
-## Possible extensions
+## Things I'd add next
 
-- Swap SQLite for a real Postgres instance (schema.sql is already written for it)
-- Schedule `run_pipeline.py` via cron/Airflow for a genuinely "real-time" MIS
-- Add a Streamlit front-end for the data-quality drill-through
-- Feed the AI narrative back into a Slack/email digest via the Claude API's tool-use
+- Count business days (not calendar days) in the late settlement check
+- Move to Postgres and schedule the pipeline (cron or Airflow)
+- Exclude flagged records from the KPIs instead of only reporting them
+- Send the weekly summary to Slack/email
